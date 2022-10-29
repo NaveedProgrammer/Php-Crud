@@ -16,9 +16,9 @@
         $res=mysqli_query($conn,$query);
         if(mysqli_num_rows($res)>0){
             $row=mysqli_fetch_assoc($res);
-            echo json_encode(array("std"=>$row));
+            echo json_encode($row);
         }else{
-            echo "NOT FOuNDED";
+            echo "RECORD NOT FOuNDED";
         }
     }else{
         header("location:crud.php");
