@@ -483,12 +483,7 @@ include 'header.php';
                         EditId: id,
                     },
                     success: function(response) {
-                        // alert(response);
-                        $.each(response, function(i, member) {
-                            for (var i in member) {
-                                alert("Company Name: " + member[i].std_name);
-                            }
-                        });
+                        alert(response);
                     },
                     error: function(XMLHttpRequest, textStatus, errorThrown) {
                         alert(textStatus);
