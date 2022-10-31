@@ -1,4 +1,5 @@
 <?php
+session_start();
     include 'header.php';
     if(isset($_POST['addStd'])){
         $name=$_POST['name'];
@@ -19,6 +20,28 @@
             echo json_encode($row);
         }else{
             echo "RECORD NOT FOuNDED";
+        }
+    }else if(isset($_POST['isDelete'])){
+        $id=$_POST['DelId'];
+        $query="DELETE FROM students WHERE std_id='$id'";
+        $res=mysqli_query($conn,$query);
+        if($res){
+            echo "Student Deleted";
+        }else{
+            echo "RECORD NOT FOuNDED";
+        }
+    }else if(isset($_POST['isUpdate'])){
+        $id=$_POST['id'];
+        $name=$_POST['name'];
+        $email=$_POST['email'];
+        $pass=$_POST['pass'];
+        $course=$_POST['course'];
+        $query="UPDATE `students` SET `std_name`='$name',`std_email`='$email',`std_pass`='$pass',`std_course`='$course' WHERE `std_id`='$id'";
+        $res=mysqli_query($conn,$query);
+        if($res){
+            echo $name." Updated";
+        }else{
+            echo "OOPs Updation Failed";
         }
     }else{
         header("location:crud.php");

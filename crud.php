@@ -1,5 +1,10 @@
 <?php
+session_start();
 include 'header.php';
+if (isset($_SESSION['msg'])) {
+    echo $_SESSION['msg'];
+    unset($_SE['msg']);
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -339,14 +344,15 @@ include 'header.php';
                                             <label for="checkbox1"></label>
                                         </span>
                                     </td>
+                                    <td style="display: none;" id="std_id"><?php echo $row['std_id']; ?></td>
                                     <td><?php echo $row['std_name']; ?></td>
                                     <td><?php echo $row['std_email']; ?></td>
                                     <td><?php echo $row['std_pass']; ?></td>
                                     <td><?php echo $row['std_course']; ?></td>
                                     <td>
-                                        <button data-target="" class="edit btn btn-warning btn-sm" data-toggle="modal" value="<?php echo $row['std_id']; ?>"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></button>
-                                        <!-- <a href="" id="edit"  ></a> -->
-                                        <a href="#deleteEmployeeModal" class="delete" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
+                                        <!-- <button data-target="" class="edit btn btn-warning btn-sm" data-toggle="modal" value="<?php echo $row['std_id']; ?>"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></button> -->
+                                        <a href="#editEmployeeModal" class="edit" id="<?php echo $row['std_id']; ?>" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Edit">&#xE254;</i></a>
+                                        <a href="#deleteEmployeeModal" class="delete" id="<?php echo $row['std_id']; ?>" data-toggle="modal"><i class="material-icons" data-toggle="tooltip" title="Delete">&#xE872;</i></a>
                                     </td>
                                 </tr>
                             <?php
@@ -418,7 +424,7 @@ include 'header.php';
     <div id="editEmployeeModal" class="modal fade">
         <div class="modal-dialog">
             <div class="modal-content">
-                <form action="code.php" action="POST">
+                <form action="code.php" class="edit_form" action="POST">
                     <div class="modal-header">
                         <h4 class="modal-title">Edit Employee</h4>
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
@@ -426,24 +432,25 @@ include 'header.php';
                     <div class="modal-body">
                         <div class="form-group">
                             <label>Name</label>
-                            <input type="text" class="form-control" name="name" id="name" required>
+                            <input type="text" class="form-control" name="name" id="edit_name" required>
+                            <input type="hidden" class="form-control" name="id" id="edit_id" required>
                         </div>
                         <div class="form-group">
                             <label>Email</label>
-                            <input type="email" class="form-control" name="email" id="email" required>
+                            <input type="email" class="form-control" name="email" id="edit_email" required>
                         </div>
                         <div class="form-group">
                             <label>Password</label>
-                            <input type="password" class="form-control" name="pass" id="pass">
+                            <input type="password" class="form-control" name="pass" id="edit_pass">
                         </div>
                         <div class="form-group">
                             <label>Course</label>
-                            <input type="text" class="form-control" name="course" id="course">
+                            <input type="text" class="form-control" name="course" id="edit_course">
                         </div>
                     </div>
                     <div class="modal-footer">
                         <input type="button" class="btn btn-default" data-dismiss="modal" value="Cancel">
-                        <input type="submit" class="btn btn-info" value="Save">
+                        <input type="submit" class="btn btn-info" value="Save" name="btnUpdate">
                     </div>
                 </form>
             </div>
@@ -473,14 +480,59 @@ include 'header.php';
     <script>
         $(document).ready(function() {
             $('.edit').on('click', function() {
-                var id = $(this).val();
-                alert(id);
+                var id = $(this).attr("id");
+                // alert(id);
                 $.ajax({
                     url: 'code.php',
                     type: 'POST',
                     data: {
                         isEdit: 1,
                         EditId: id,
+                    },
+                    success: function(response) {
+                        var obj = JSON.parse(response);
+                        $("#edit_name").val(obj.std_name);
+                        $("#edit_id").val(obj.std_id);
+                        $("#edit_email").val(obj.std_email);
+                        $("#edit_pass").val(obj.std_pass);
+                        $("#edit_course").val(obj.std_course);
+                    },
+                    error: function(XMLHttpRequest, textStatus, errorThrown) {
+                        alert(textStatus);
+                    }
+                });
+            });
+            $('.delete').on('click', function() {
+                var del_res=confirm("Do you want to delete Student");
+                if(del_res){
+                    var id = $(this).attr("id");
+                    $.ajax({
+                        url: 'code.php',
+                        type: 'POST',
+                        data: {
+                            isDelete: 1,
+                            DelId: id,
+                        },
+                        success: function(response) {
+                            alert(response);
+                        },
+                        error: function(XMLHttpRequest, textStatus, errorThrown) {
+                            alert(textStatus);
+                        }
+                    });
+                }
+            });
+            $('.edit_form').on('submit', function() {
+                $.ajax({
+                    url: 'code.php',
+                    type: 'POST',
+                    data: {
+                        isUpdate: 1,
+                        id:$("#edit_id").val(),
+                        name:$("#edit_name").val(),
+                        email:$("#edit_email").val(),
+                        pass:$("#edit_pass").val(),
+                        course:$("#edit_course").val(),
                     },
                     success: function(response) {
                         alert(response);
